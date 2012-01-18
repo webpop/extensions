@@ -22,7 +22,7 @@ When pulling in content in your templates, you need to specify what fields to tr
       <pop:lang:t field="body"/>
     </pop:entries>
 
-Note that instead of pulling in the fields directly (<pop:title/>, <pop:body/>) we use the extension tag to translate the fields: <pop:lang:t field="field you want to translate"/>
+Note that instead of pulling in the fields directly (`<pop:title/>`, `<pop:body/>`) we use the extension tag to translate the fields: `<pop:lang:t field="field you want to translate"/>`
 
 You can still use the normal tags for fields that doesn't need translation (image fields for example).
 
@@ -51,4 +51,4 @@ The extension will handle navigating from one language to the other. Here's an e
       </ul> 
     </div> 
 
-The <pop:lang:link lang='es'/> will return a url to the current content in the specified language.
+The `<pop:lang:link lang='es'/>` will return a url to the current content in the specified language.
