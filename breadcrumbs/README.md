@@ -7,11 +7,11 @@ To use it add nav.js to your extension folder. Then you can access the list of b
 
     <ul>
       <pop:nav:breadcrumbs>
-        <pop:current>
+        <pop:last>
           <li><span><pop:title/></span></li>
-        </pop:current>
-        <pop:not_current>
+        </pop:last>
+        <pop:not_last>
           <li><a href="<pop:permalink/>"><pop:title/></a></li>
-        </pop:not_current>
+        </pop:not_last>
       </pop:nav:breadcrumbs>
     </ul>
