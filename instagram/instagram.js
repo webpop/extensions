@@ -10,6 +10,14 @@ var version = "1.0";
 
 var redirectUrl = file.join(section.url, "instagram/response");
 
+exports.recent = function() {
+  var token = storage.get("instagram_access_token");
+  if (token) {
+    var feed = http.get(api + "/v1//users/self/media/recent?access_token=" + token);
+    return feed.data;
+  }
+}
+
 exports.feed = function() {
   var token = storage.get("instagram_access_token");
   if (token) {
