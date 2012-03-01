@@ -25,10 +25,10 @@ exports.current = function() { return language; };
 
 exports.t = function(options, enclosed, scope) {
   if (options.field == "permalink") {
-    return language == defaultLang ? scope.permalink : "/" + language + scope.permalink ;
+    return language == defaultLang ? scope.lookup('permalink') : "/" + language + scope.lookup('permalink') ;
   } else {
     var field = language == defaultLang ? options.field : options.field + "_" + language;
-    return scope[field] || scope[options.field];
+    return scope.lookup(field) || scope.lookup(options.field);
   }
 };
 
