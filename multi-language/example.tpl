@@ -3,7 +3,7 @@
 <h2>Using translated fields</h2>
 
 <pop:entries from="blog">
-  <h3><a href='<pop:lang:t field="permalink"'><pop:lang:t field="title"/></a></h3>
+  <h3><a href='<pop:lang:t field="permalink"/>'><pop:lang:t field="title"/></a></h3>
   <pop:lang:t field="body"/>
 </pop:entries>
 
