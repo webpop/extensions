@@ -18,7 +18,7 @@ Using translations in the templates
 When pulling in content in your templates, you need to specify what fields to translate. Lets imagine you have a section "blog" with entries that have a translated title and body field. This is how you would show an index page for the blog with links to the entries:
 
     <pop:entries from="blog">
-      <h1><a href='<pop:lang:t field="permalink"'><pop:lang:t field="title"/></a></h1>
+      <h1><a href='<pop:lang:t field="permalink"/>'><pop:lang:t field="title"/></a></h1>
       <pop:lang:t field="body"/>
     </pop:entries>
 
