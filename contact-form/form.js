@@ -5,19 +5,19 @@ var result = null;
 
 exports.deliver = function(options) {
   if (result) return result;
-  if (request.request_method == "POST") {
-    if (request.params.name && request.params.email && request.params.message) {
-      mailer.send(
-        options.to,
-        'New Message From "' + request.params.email + '"',
-        request.params.message
-      );
-      result = {success: true};
-    } else {
-      result = {error: true};
-    }
-    return result;
-  } 
+  if (request.request_method !== "POST") return null;
+
+  if (request.params.name && request.params.email && request.params.message) {
+    var subject = 'New message from ' + request.params.name + ' (' + request.params.email + ')',
+        message = request.params.message;
+
+    mailer.send(options.to, subject, message);
+
+    result = {success: true};
+  } else {
+    result = {error: true};
+  }
+  return result;
 };
 
 exports.name = function() { 
