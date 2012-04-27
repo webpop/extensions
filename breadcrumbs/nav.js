@@ -5,5 +5,8 @@ exports.breadcrumbs = function(options) {
   while (content = content.parent) {
     breadcrumb.unshift(content);
   }
+  if (options.exclude_home) {
+    breadcrumb.shift();
+  }
   return breadcrumb;
 };
