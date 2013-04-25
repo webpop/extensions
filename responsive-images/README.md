@@ -1,7 +1,7 @@
 Responsive Images
 =================
 
-This extensions gives you a <pop:picture:responsive/> tag for adding responsive images to your site.
+This extensions gives you a ``<pop:picture:responsive/>`` tag for adding responsive images to your site.
 
 It uses [Picture fill](https://github.com/scottjehl/picturefill) to serve different sizes of images to different sizes of screen and pixel densities (e.g. Retina displays ). With only one server request per image.
 
