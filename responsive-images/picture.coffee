@@ -1,5 +1,5 @@
-// This generates markup for https://github.com/scottjehl/picturefill
-// Feel free to customize the markup to suit your needs
+# This generates markup for https://github.com/scottjehl/picturefill
+# Feel free to customize the markup to suit your needs
 
 markupForImage = (image, options) ->
   resize = options.resize
@@ -25,7 +25,7 @@ markupForImage = (image, options) ->
 exports.responsive = (options, enclosed, scope) ->
   obj = scope.lookup(options.field)
 
-  // Check if it's a gallery
+  # Check if it's a gallery
   if obj.images
     {html: markupForImage(image, options)} for image in obj.images
   else
