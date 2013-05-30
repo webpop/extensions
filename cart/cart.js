@@ -1,5 +1,5 @@
 var mailer = require("mailer"),
-    mail   = "name@example.com";
+    mail   = "ruemic@me.com";
 
 
 /* Get any items from the cart in the session */

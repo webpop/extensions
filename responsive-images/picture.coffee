@@ -10,7 +10,7 @@ markupForImage = (image, options) ->
     '<div data-picture data-alt="' + image.alt + '">' +
 
     '<div data-src="' + image.src({ resize: resize, width: width, height: height }) + '"> </div>' +
-    '<div data-src="' + image.src({ resize: resize, width: width*2, height: height }) + '" data-media="(min-device-pixel-ratio: 2.0)"> </div>' +
+    '<div data-src="' + image.src({ resize: resize, width: width*2, height: height*2 }) + '" data-media="(min-device-pixel-ratio: 2.0)"> </div>' +
 
     '<div data-src="' + image.src({ resize: resize, width: width*2, height: height*2 }) + '" data-media="(min-width: 768px)"> </div>' +
     '<div data-src="' + image.src({ resize: resize, width: width*4, height: height*4 }) + '" data-media="(min-width: 768px) and (min-device-pixel-ratio: 2.0)"> </div>' +
