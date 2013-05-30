@@ -12,7 +12,7 @@
 
   <h2>In your cart:</h2>
   <pop:cart:items wrap="ul" break="li">
-    <h2><pop:title/> (<pop:cuantity/>)</h2>
+    <h2><pop:title/> (<pop:quantity/>)</h2>
     <pop:body/>
   </pop:cart:items>
 
