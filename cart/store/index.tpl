@@ -1,4 +1,4 @@
-<pop:layout name="cart"/>
+<pop:layout name="default"/>
 <pop:block region="main">
 
   <pop:include template="cart/_current_items"/>
