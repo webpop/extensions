@@ -1,12 +1,12 @@
 <!doctype html>
 <html>
+
   <head>
-    <title>Shopping Cart</title>
+    <title><pop:content.title/></title>
     <pop:admin/>
   </head>
 
   <body>
-    <h1>Shopping Cart</h1>
     <pop:region name="main"></pop:region>
     <pop:development.log/>
   </body>

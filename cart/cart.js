@@ -1,5 +1,5 @@
 var mailer = require("mailer"),
-    mail   = "test@example.com";
+    mail   = "name@example.com";
 
 
 /* Get any items from the cart in the session */
@@ -9,12 +9,15 @@ var getItems = function() {
 
 
 /* Add an item to the cart in the session */
-var addItem= function(options) {
+var addItem = function(options) {
   if (options.id) {
-    var items = getItems() || {};
+    var items = getItems() || {},
+        curQuantity  = items[options.id] ? items[options.id] : 0,
+        quantity     = parseInt(options.quantity || 1, 10);
 
-    var cuantity  = items[options.id] ? items[options.id] : 0;
-    items[options.id] = cuantity + (options.cuantity || 1);
+    if (quantity < 1) return;
+
+    items[options.id] = curQuantity + quantity;
     request.session.shopping_cart = JSON.stringify(items);
   }
 };
@@ -23,28 +26,51 @@ var addItem= function(options) {
 /*
  * <pop:cart:items>
  * Returns a list of items
- * Adds a "cuantity" attribute to each item
+ * Adds a "quantity" attribute to each item
  */
 exports.items = function() {
   var items = getItems();
-  var result = [];  
+  var result = [];
   if (items) {
     for(var id in items) {
       var item = site.content({from: id});
-      item.cuantity = items[id];
+      if (item == null) continue;
+      item.quantity = parseInt(items[id], 10);
+      var price = item.price && parseFloat(item.price);
+      item.total = price && item.quantity * price;
       result.push(item);
     }
   }
   return result;
 };
 
+exports.item_count = function() {
+  var items    = getItems(),
+      quantity = 0;
+  for (var key in items) {
+    quantity += parseInt(items[key], 10);
+  };
+  return quantity;
+};
+
+exports.total = function() {
+  var total = 0;
+  var items = exports.items();
+  if (items) {
+    items.forEach(function(item) {
+      var price = parseFloat(item.price);
+      if (price) { total += price*item.quantity; }
+    });
+  }
+  return total;
+}
 
 /*
  * <pop:cart:add_item_action/>
  * Returns the form action to be used when adding items to the cart.
  */
 exports.add_item_action = function(options, enclosed, scope) {
-  return section && section.permalink + "/add/" + (scope.id || options.id);
+  return  "/cart/add/" + (options.id || scope.id);
 };
 
 
@@ -53,39 +79,39 @@ exports.add_item_action = function(options, enclosed, scope) {
  * Returns the url to the checkout.
  */
 exports.checkout_link = function(options) {
-  return section && section.permalink + "/checkout";
+  return "/cart/checkout";
 };
 
-
-exports.get = {
-  /* Checkout confirmation screen - renders the cart/checkout template */
-  "checkout": function(params) {
-    response.render("cart/checkout", {items: exports.items(), confirmed: false});
-  }
-};
-
-exports.post = {
-  /* Add an item and redirect back to the section */
-  "add/:id": function(params) {
-    var content = site.content({from: params.id});
-    addItem(params);
-
-    response.send("Product added", {Location: section.permalink}, 302);
+exports.routes = {
+  get: {
+    "checkout": function(params) {
+      response.render("cart/checkout", {title: "Checkout", items: exports.items(), confirmed: false});
+    }
   },
+  post: {
+    "add/:id": function(params) {
+      var content = site.content({from: params.id});
+      addItem(params);
 
-  /* Process the items and deliver the order in a mail. */
-  "checkout": function(params) {
-    var items = exports.items();
+      response.send("Product added", {Location: content.permalink || "/"}, 302);
+    },
 
-    var message = ["New order from " + params.name, "", "Items: "];
-    for (var i in items) {
-      message.push("" + items[i].cuantity + ": " + items[i].title);
-    };
-    message.push("\nName: " + params.name + "\nEmail: " + params.email + "\nAddress: " + params.address);
-    mailer.send(mail, "New Order", message.join('\n'));
+    /* Process the items and deliver the order in a mail. */
+    "checkout": function(params) {
+      var items = exports.items();
 
-    request.session.shopping_cart = null;
+      var message = ["New order from " + params.name, "", "Items: "];
+      for (var i in items) {
+        message.push("" + items[i].quantity + ": " + items[i].title);
+      };
+      message.push("\nName: " + params.name + "\nEmail: " + params.email + "\nAddress: " + params.address);
+      mailer.send(mail, "New Order", message.join('\n'));
 
-    response.render("cart/checkout", {items: items, confirmed: true});
+      request.session.shopping_cart = null;
+
+      var amount = parseFloat(params.amount);
+
+      response.render("cart/checkout", {title: "Order confirmation", items: items, confirmed: true, total: params.amount, total_cents: amount * 100});
+    }
   }
 };
