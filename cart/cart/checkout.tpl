@@ -12,11 +12,11 @@
       <table>
         <tr>
           <th>Name</th>
-          <th>Cuantity</th>
+          <th>Quantity</th>
         </tr>
         <pop:cart:items break="tr">
           <td><pop:title/></td>
-          <td><pop:cuantity/></td>
+          <td><pop:quantity/></td>
         </pop:cart:items>  
       </table>
 
