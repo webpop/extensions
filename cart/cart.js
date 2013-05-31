@@ -22,6 +22,19 @@ var addItem = function(options) {
   }
 };
 
+/* Update an item in the cart */
+var updateItem = function(options) {
+  if (options.id) {
+    var items = getItems() || {},
+        quantity = parseInt(options.quantity || 1, 10);
+
+    if (quantity < 0) return;
+
+    items[options.id] = quantity;
+    request.session.shopping_cart = JSON.stringify(items);
+  }
+};
+
 
 /*
  * <pop:cart:items>
@@ -51,6 +64,7 @@ exports.item_count = function() {
     quantity += parseInt(items[key], 10);
   };
   return quantity;
+
 };
 
 exports.total = function() {
@@ -71,6 +85,10 @@ exports.total = function() {
  */
 exports.add_item_action = function(options, enclosed, scope) {
   return  "/cart/add/" + (options.id || scope.id);
+};
+
+exports.update_item_action = function(options, enclosed, scope) {
+  return  "/cart/update/" + (options.id || scope.id);
 };
 
 
@@ -94,6 +112,13 @@ exports.routes = {
       addItem(params);
 
       response.send("Product added", {Location: content.permalink || "/"}, 302);
+    },
+
+    "update/:id" : function(params) {
+      var content =  site.content({from: params.id});
+      updateItem(params);
+
+      response.send("Product updated", {Location: "/cart/checkout"}, 302);
     },
 
     /* Process the items and deliver the order in a mail. */

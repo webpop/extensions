@@ -17,10 +17,12 @@
           <th>Quantity</th>
         </tr>
         <pop:cart:items break="tr">
-          <td><pop:title/></td>
-          <td><pop:quantity/></td>
+          <form action="<pop:cart:update_item_action/>" method="post">
+            <td><pop:title/></td>
+            <td><input type="integer" name="quantity" value="<pop:quantity/>"/></td>
+            <td><button>Update</button></td>
+          </form>
         </pop:cart:items>
-
       </table>
 
       <h2>Confirm your order</h2>
