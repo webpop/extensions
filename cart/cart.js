@@ -29,8 +29,13 @@ var updateItem = function(options) {
         quantity = parseInt(options.quantity || 1, 10);
 
     if (quantity < 0) return;
-
-    items[options.id] = quantity;
+    
+    if (quantity == 0) {
+      delete items[options.id]
+    } else {
+      items[options.id] = quantity;
+    }
+    
     request.session.shopping_cart = JSON.stringify(items);
   }
 };
