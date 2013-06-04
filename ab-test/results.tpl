@@ -11,7 +11,7 @@
       </tr>
     </thead>
     <tbody>
-      <pop:variations name="example-test" break="tr">
+      <pop:variations break="tr">
         <td><pop:name/></td>
         <td><pop:picks/></td>
         <td><pop:wins/></td>
