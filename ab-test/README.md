@@ -16,7 +16,7 @@ How to Make a Test
 
 4. Create a goal for your test by adding `<pop:ab:goal name="example-test"/>` to the page which visitors will see after they have taken the action you are trying to optimize for. A typical place to put it would be in the confirmation message after a form submission.
 
-5. Upload results.tpl to your templates, create a section called "AB Results" and assign it to results.tpl. Make sure that `<pop:variations>` has your tests name, eg `<pop:variations name="my-first-test">`.
+5. Upload results.tpl to your templates, create a section called "AB Results" and assign it to results.tpl. Here's where you'll be able to view how your variations perform.
 
 6. Now your test should be up and running, everytime someone gets to the page with the `<pop:ab:goal name="my-first-test">` tag, a win is logged for the variation which they saw. A win is only logged once per session.
 
