@@ -20,6 +20,6 @@ How to Make a Test
 
 6. Now your test should be up and running, everytime someone gets to the page with the `<pop:ab:goal name="my-first-test">` tag, a win is logged for the variation which they saw. A win is only logged once per session.
 
-7. Verify that all your variations are displaying correctly by appending "?ab=champion" or "?ab=contender" (or whatever you chose to name your variations) to the end to the url of the page which you are running the test.
+7. Verify that all your variations are displaying correctly by appending "?ab=champion" or "?ab=contender" (or whatever you chose to name your variations) to the end to the url of the page which you are running the test. You should see the corresponding markup on the page.
 
-8. Vist your results page, you should start seeing wins and a statistical analysis of your tests displayed here once people start hitting the goal. And now you just have to site back and wait. It's best to let at least 10 wins acrue for each variation before concluding a winner for a test.
+8. Visit your results page, you should start seeing wins and a statistical analysis of your tests displayed here once people start hitting the goal. And now you just have to sit back and wait. It's best to let at least 10 wins acrue for each variation before concluding a winner for a test.
