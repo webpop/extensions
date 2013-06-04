@@ -1,7 +1,6 @@
 var mailer = require("mailer"),
     mail   = "name@example.com";
 
-
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -59,7 +58,8 @@ exports.items = function() {
       if (item == null) continue;
       item.quantity = parseInt(items[id], 10);
       var price = item.price && parseFloat(item.price.replace(/,/g, ''));
-      item.total = price && item.quantity * price;
+      var total = price && item.quantity * price;
+      item.total = numberWithCommas(total);
       result.push(item);
     }
   }
