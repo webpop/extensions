@@ -1,15 +1,16 @@
 var mailer = require("mailer"),
     mail   = "name@example.com";
 
+/* Utilities */
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+};
+
 
 /* Get any items from the cart in the session */
 var getItems = function() {
   return request.session.shopping_cart && JSON.parse(request.session.shopping_cart);
 };
-
 
 /* Add an item to the cart in the session */
 var addItem = function(options) {
@@ -66,6 +67,12 @@ exports.items = function() {
   return result;
 };
 
+
+
+/*
+ * <pop:cart:item_count/>
+ * Returns the total number of items in the cart.
+ */
 exports.item_count = function() {
   var items    = getItems(),
       quantity = 0;
@@ -75,6 +82,12 @@ exports.item_count = function() {
   return numberWithCommas(quantity);
 };
 
+
+
+/*
+ * <pop:cart:total/>
+ * Returns the sums of all the items by price.
+ */
 exports.total = function() {
   var total = 0;
   var items = exports.items();
@@ -86,6 +99,7 @@ exports.total = function() {
   }
   return numberWithCommas(total);
 }
+
 
 /*
  * <pop:cart:add_item_action/>
@@ -100,13 +114,26 @@ exports.update_item_action = function(options, enclosed, scope) {
 };
 
 
+
 /*
  * <pop:cart:checkout_link/>
- * Returns the url to the checkout.
+ * Returns the url to the checkout page.
  */
 exports.checkout_link = function(options) {
   return "/cart/checkout";
 };
+
+/* 
+ * <pop:cart:message/>
+ * Display a message from the session, eg. "Product Added".
+ */
+exports.message = function() {
+  if (request.session.flash_message) {
+    var msg = request.session.flash_message;
+    request.session.flash_message = null;
+    return msg;
+  }
+}
 
 exports.routes = {
   get: {
@@ -115,17 +142,25 @@ exports.routes = {
     }
   },
   post: {
+    /* Add an item to the cart */
     "add/:id": function(params) {
       var content = site.content({from: params.id});
       addItem(params);
-
-      response.send("Product added", {Location: content.permalink || "/"}, 302);
+      request.session.flash_message = "Product added";
+      
+      response.send("Product added", {Location: content.permalink || '/'}, 302);
     },
 
+    
+    /* Update the quantity of an item in the cart */
     "update/:id" : function(params) {
       var content =  site.content({from: params.id});
       updateItem(params);
-
+      if (params.quantity > 0) {
+          request.session.flash_message = "Quantity updated";
+      } else if (params.quantity == 0) {
+        request.session.flash_message = "Product has removed from cart";
+      } 
       response.send("Product updated", {Location: "/cart/checkout"}, 302);
     },
 
