@@ -146,7 +146,7 @@ exports.routes = {
     "add/:id": function(params) {
       var content = site.content({from: params.id});
       addItem(params);
-      request.session.flash_message = "Product added";
+      request.session.flash_message = "Product has been added to cart";
       
       response.send("Product added", {Location: content.permalink || '/'}, 302);
     },
@@ -157,9 +157,9 @@ exports.routes = {
       var content =  site.content({from: params.id});
       updateItem(params);
       if (params.quantity > 0) {
-          request.session.flash_message = "Quantity updated";
+          request.session.flash_message = "Product quantity updated";
       } else if (params.quantity == 0) {
-        request.session.flash_message = "Product has removed from cart";
+        request.session.flash_message = "Product has been removed from cart";
       } 
       response.send("Product updated", {Location: "/cart/checkout"}, 302);
     },
