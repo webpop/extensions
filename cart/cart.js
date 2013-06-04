@@ -2,6 +2,10 @@ var mailer = require("mailer"),
     mail   = "name@example.com";
 
 
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 /* Get any items from the cart in the session */
 var getItems = function() {
   return request.session.shopping_cart && JSON.parse(request.session.shopping_cart);
@@ -54,7 +58,7 @@ exports.items = function() {
       var item = site.content({from: id});
       if (item == null) continue;
       item.quantity = parseInt(items[id], 10);
-      var price = item.price && parseFloat(item.price);
+      var price = item.price && parseFloat(item.price.replace(/,/g, ''));
       item.total = price && item.quantity * price;
       result.push(item);
     }
@@ -68,8 +72,7 @@ exports.item_count = function() {
   for (var key in items) {
     quantity += parseInt(items[key], 10);
   };
-  return quantity;
-
+  return numberWithCommas(quantity);
 };
 
 exports.total = function() {
@@ -77,11 +80,11 @@ exports.total = function() {
   var items = exports.items();
   if (items) {
     items.forEach(function(item) {
-      var price = parseFloat(item.price);
+      var price = parseFloat(item.price.replace(/,/g, ''));
       if (price) { total += price*item.quantity; }
     });
   }
-  return total;
+  return numberWithCommas(total);
 }
 
 /*
