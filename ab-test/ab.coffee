@@ -54,11 +54,7 @@ exports.goal = (options, enclosed) ->
 exports.results = (options, enclosed) ->
   ret = []
 
-  log("Hello")
-  log(JSON.stringify(storage.list({tag: "ab"})))
-
   for test in storage.list({tag: "ab"})
-    log("Got test" + JSON.stringify(test));
     title     = test.key.replace(/^ab_/, '')
     results   = JSON.parse(test.value)
     wins      = JSON.parse(storage.get(test.key + "_wins") || "{}");
