@@ -1,5 +1,5 @@
 var mailer = require("mailer"),
-    mail   = "name@example.com";
+    mail   = "store@webpop.com";
 
 /* Utilities */
 function numberWithCommas(x) {
@@ -68,7 +68,6 @@ exports.items = function() {
 };
 
 
-
 /*
  * <pop:cart:item_count/>
  * Returns the total number of items in the cart.
@@ -81,7 +80,6 @@ exports.item_count = function() {
   };
   return numberWithCommas(quantity);
 };
-
 
 
 /*
@@ -114,7 +112,6 @@ exports.update_item_action = function(options, enclosed, scope) {
 };
 
 
-
 /*
  * <pop:cart:checkout_link/>
  * Returns the url to the checkout page.
@@ -122,6 +119,7 @@ exports.update_item_action = function(options, enclosed, scope) {
 exports.checkout_link = function(options) {
   return "/cart/checkout";
 };
+
 
 /* 
  * <pop:cart:message/>
@@ -135,6 +133,8 @@ exports.message = function() {
   }
 }
 
+
+/* Respond to these custom urls */
 exports.routes = {
   get: {
     "checkout": function(params) {
@@ -154,26 +154,34 @@ exports.routes = {
     
     /* Update the quantity of an item in the cart */
     "update/:id" : function(params) {
-      var content =  site.content({from: params.id});
+      var content = site.content({from: params.id});
       updateItem(params);
       if (params.quantity > 0) {
           request.session.flash_message = "Product quantity updated";
       } else if (params.quantity == 0) {
         request.session.flash_message = "Product has been removed from cart";
-      } 
+      }
+      
       response.send("Product updated", {Location: "/cart/checkout"}, 302);
     },
 
     /* Process the items and deliver the order in a mail. */
     "checkout": function(params) {
+      var name = params.first_name + " " + params.last_name;
+      var message = ["New order from " + name, "", "Items: "];
+      var customer_message =["Thank you for your order " + params.first_name, "", "Items: "];
       var items = exports.items();
-
-      var message = ["New order from " + params.name, "", "Items: "];
+      
       for (var i in items) {
         message.push("" + items[i].quantity + ": " + items[i].title);
+        customer_message.push("" + items[i].quantity + ": " + items[i].title);
       };
-      message.push("\nName: " + params.name + "\nEmail: " + params.email + "\nAddress: " + params.address);
-      mailer.send(mail, "New Order", message.join('\n'));
+      
+      message.push("\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address);
+      customer_message.push("\nTotal: $" + exports.total(),"\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address,"", "Please contact us if you have any questions.");
+
+      mailer.send(mail, "New Order", message.join('\n'));      
+      mailer.send(params.email, "Thank you for your order.", customer_message.join('\n'));
 
       request.session.shopping_cart = null;
 
