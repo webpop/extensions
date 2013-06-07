@@ -28,7 +28,10 @@
       <h2>Confirm your order</h2>
       <form action="<pop:cart:checkout_action/>" method="post">
         <p>
-          <label>Name: <input name="name" required/></label>
+          <label>First name: <input name="first_name" required/></label>
+        </p>
+        <p>
+          <label>Last name: <input name="last_name" required/></label>
         </p>
         <p>
           <label>Email: <input name="email" type="email" required/></label>
