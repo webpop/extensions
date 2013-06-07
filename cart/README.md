@@ -1,10 +1,9 @@
 Shopping Cart Extension
 =======================
 
-This is a very barebones shopping cart extensions for getting started
-with a simple shopping cart.
+This is an extension for getting started with a simple shopping cart.
 
-Orders are simply submitted via email.
+Orders are submitted via email.
 
 Usage
 =====
