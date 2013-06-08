@@ -1,5 +1,6 @@
-var mailer = require("mailer"),
-    mail   = "store@webpop.com";
+var mailer  = require("mailer"),
+    storage = require("storage"),
+    mail    = "store@webpop.com";
 
 /* Utilities */
 function numberWithCommas(x) {
@@ -33,13 +34,13 @@ var updateItem = function(options) {
         quantity = parseInt(options.quantity || 1, 10);
 
     if (quantity < 0) return;
-    
+
     if (quantity == 0) {
       delete items[options.id]
     } else {
       items[options.id] = quantity;
     }
-    
+
     request.session.shopping_cart = JSON.stringify(items);
   }
 };
@@ -60,7 +61,7 @@ exports.items = function() {
       item.quantity = parseInt(items[id], 10);
       var price = item.price && parseFloat(item.price.replace(/,/g, ''));
       var total = price && item.quantity * price;
-      item.total = numberWithCommas(total);
+      item.total = numberWithCommas(total.toFixed(2));
       result.push(item);
     }
   }
@@ -95,7 +96,7 @@ exports.total = function() {
       if (price) { total += price*item.quantity; }
     });
   }
-  return numberWithCommas(total);
+  return numberWithCommas(total.toFixed(2));
 }
 
 
@@ -121,7 +122,7 @@ exports.checkout_link = function(options) {
 };
 
 
-/* 
+/*
  * <pop:cart:message/>
  * Display a message from the session, eg. "Product Added".
  */
@@ -139,6 +140,18 @@ exports.routes = {
   get: {
     "checkout": function(params) {
       response.render("cart/checkout", {title: "Checkout", items: exports.items(), confirmed: false});
+    },
+    "orders": function(params) {
+      if (request.user) {
+        var orders = storage.list({tags: ["ecommerce", "order"]}).map(function(data) {
+          var order = JSON.parse(data.value)
+          order.items = order.items.map(function(obj) { var item = obj.item; item.quantity = obj.quantity; return item; })
+          return order;
+        });
+        response.render("cart/orders", {title: "Orders", orders: orders});
+      } else {
+        response.send("Redirecting to login", {Location: "/admin"}, 302);
+      }
     }
   },
   post: {
@@ -147,21 +160,21 @@ exports.routes = {
       var content = site.content({from: params.id});
       addItem(params);
       request.session.flash_message = "Product has been added to cart";
-      
+
       response.send("Product added", {Location: content.permalink || '/'}, 302);
     },
 
-    
+
     /* Update the quantity of an item in the cart */
     "update/:id" : function(params) {
       var content = site.content({from: params.id});
       updateItem(params);
       if (params.quantity > 0) {
-          request.session.flash_message = "Product quantity updated";
+        request.session.flash_message = "Product quantity updated";
       } else if (params.quantity == 0) {
         request.session.flash_message = "Product has been removed from cart";
       }
-      
+
       response.send("Product updated", {Location: "/cart/checkout"}, 302);
     },
 
@@ -171,17 +184,32 @@ exports.routes = {
       var message = ["New order from " + name, "", "Items: "];
       var customer_message =["Thank you for your order " + params.first_name, "", "Items: "];
       var items = exports.items();
-      
+
       for (var i in items) {
         message.push("" + items[i].quantity + ": " + items[i].title);
         customer_message.push("" + items[i].quantity + ": " + items[i].title);
       };
-      
+
       message.push("\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address);
       customer_message.push("\nTotal: $" + exports.total(),"\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address,"", "Please contact us if you have any questions.");
 
-      mailer.send(mail, "New Order", message.join('\n'));      
+      mailer.send(mail, "New Order", message.join('\n'));
       mailer.send(params.email, "Thank you for your order.", customer_message.join('\n'));
+
+      var ts = new Date(),
+          id = "order-" + ts.getTime() + "-" + Math.random();
+
+      storage.put(id, JSON.stringify({
+        items: items.map(function(item) { return {item: item, quantity: item.quantity} }),
+        created_at: ts,
+        customer: {
+        first_name: params.first_name,
+        last_name: params.last_name,
+        address: params.address,
+        email: params.email
+        },
+        total: exports.total()
+      }), {tags: ["ecommerce", "order"]});
 
       request.session.shopping_cart = null;
 
