@@ -7,7 +7,6 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-
 /* Get any items from the cart in the session */
 var getItems = function() {
   return request.session.shopping_cart && JSON.parse(request.session.shopping_cart);
@@ -112,7 +111,6 @@ exports.update_item_action = function(options, enclosed, scope) {
   return  "/cart/update/" + (options.id || scope.id);
 };
 
-
 /*
  * <pop:cart:checkout_link/>
  * Returns the url to the checkout page.
@@ -121,6 +119,51 @@ exports.checkout_link = function(options) {
   return "/cart/checkout";
 };
 
+/*
+ * <pop:cart:create_order/>
+ * Creates an order in the database and sends mails to both the store owner
+ * and the customer.
+ * Needs an "id" attribute that will be the unique ID for the order.
+ */
+exports.create_order = function(options) {
+  if (!options.id) { throw("<pop:cart:create_order> needs an id!"); }
+
+  var params           = request.params,
+      name             = params.first_name + " " + params.last_name,
+      message          = ["New order from " + name, "", "Items: "],
+      customer_message = ["Thank you for your order " + params.first_name, "", "Items: "],
+      items            = exports.items();
+
+  for (var i in items) {
+    message.push("" + items[i].quantity + ": " + items[i].title);
+    customer_message.push("" + items[i].quantity + ": " + items[i].title);
+  };
+
+  message.push("\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address);
+  customer_message.push("\nTotal: $" + exports.total(),"\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address,"", "Please contact us if you have any questions.");
+
+  mailer.send(mail, "New Order", message.join('\n'));
+  mailer.send(params.email, "Thank you for your order.", customer_message.join('\n'));
+
+  var order = {
+    id: options.id,
+    items: items.map(function(item) { return {item: item, quantity: item.quantity} }),
+    created_at: new Date(),
+    customer: {
+      first_name: params.first_name,
+      last_name: params.last_name,
+      address: params.address,
+      email: params.email
+   },
+     total: exports.total()
+  };
+
+  storage.put(options.id, JSON.stringify(order), {tags: ["ecommerce", "order"]});
+
+  request.session.shopping_cart = null;
+
+  return order;
+};
 
 /*
  * <pop:cart:message/>
@@ -139,7 +182,7 @@ exports.message = function() {
 exports.routes = {
   get: {
     "checkout": function(params) {
-      response.render("cart/checkout", {title: "Checkout", items: exports.items(), confirmed: false});
+      response.render("cart/checkout", {title: "Checkout", items: exports.items() });
     },
     "orders": function(params) {
       if (request.user) {
@@ -148,6 +191,7 @@ exports.routes = {
           order.items = order.items.map(function(obj) { var item = obj.item; item.quantity = obj.quantity; return item; })
           return order;
         });
+        orders = orders.sort(function(a,b) { return new Date(b.created_at).getTime() - new Date(a.created_at).getTime() });
         response.render("cart/orders", {title: "Orders", orders: orders});
       } else {
         response.send("Redirecting to login", {Location: "/admin"}, 302);
@@ -158,8 +202,15 @@ exports.routes = {
     /* Add an item to the cart */
     "add/:id": function(params) {
       var content = site.content({from: params.id});
+      if (params.quantity < 1) {
+        request.session.flash_message = "<div class='alert-box alert'>Enter a quantity of at least one.</div>";
+      }
+
       addItem(params);
-      request.session.flash_message = "Product has been added to cart";
+
+      if (params.quantity >= 1) {
+        request.session.flash_message = "<div class='alert-box secondary'><a href='/cart/checkout'><i class='large-icon icon-shopping-cart'></i></a> Product has been added to cart</div>";
+      }
 
       response.send("Product added", {Location: content.permalink || '/'}, 302);
     },
@@ -180,42 +231,10 @@ exports.routes = {
 
     /* Process the items and deliver the order in a mail. */
     "checkout": function(params) {
-      var name = params.first_name + " " + params.last_name;
-      var message = ["New order from " + name, "", "Items: "];
-      var customer_message =["Thank you for your order " + params.first_name, "", "Items: "];
-      var items = exports.items();
+      var items  = exports.items(),
+          amount = parseFloat(params.amount);
 
-      for (var i in items) {
-        message.push("" + items[i].quantity + ": " + items[i].title);
-        customer_message.push("" + items[i].quantity + ": " + items[i].title);
-      };
-
-      message.push("\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address);
-      customer_message.push("\nTotal: $" + exports.total(),"\nName: " + name + "\nEmail: " + params.email + "\nAddress: " + params.address,"", "Please contact us if you have any questions.");
-
-      mailer.send(mail, "New Order", message.join('\n'));
-      mailer.send(params.email, "Thank you for your order.", customer_message.join('\n'));
-
-      var ts = new Date(),
-          id = "order-" + ts.getTime() + "-" + Math.random();
-
-      storage.put(id, JSON.stringify({
-        items: items.map(function(item) { return {item: item, quantity: item.quantity} }),
-        created_at: ts,
-        customer: {
-        first_name: params.first_name,
-        last_name: params.last_name,
-        address: params.address,
-        email: params.email
-        },
-        total: exports.total()
-      }), {tags: ["ecommerce", "order"]});
-
-      request.session.shopping_cart = null;
-
-      var amount = parseFloat(params.amount);
-
-      response.render("cart/checkout", {title: "Order confirmation", items: items, confirmed: true, total: params.amount, total_cents: amount * 100});
+      response.render("cart/confirmation", {title: "Order confirmation", items: items, total: params.amount, total_cents: amount * 100});
     }
   }
 };
