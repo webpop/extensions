@@ -3,7 +3,10 @@ var http    = require("http"),
 
 var url    = "https://api.stripe.com/v1/charges";
 
-/* Get the Stripe credentials and cache them for future use */
+/*
+* Get the Stripe credentials and cache them for future use
+* Do this once for the development URL and once for production.
+*/
 var credentials = function() {
   if (this.credentials) { return this.credentials; }
   this.credentials = storage.get("stripe-" + (request.isDevelopment ? "dev" : "prod") + "-credentials");
