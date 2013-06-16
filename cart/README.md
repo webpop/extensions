@@ -31,7 +31,7 @@ shopping cart.
 Payment Integration
 ===================
 
-You will need a payment processing provider to handle credit card payments on your site. Check out the [Stripe extension](https://github.com/webpop/extensions/tree/master/stripe) for an example of how to do that.
+You will need a payment processing provider to handle credit card payments on your site. Check out the [Stripe extension](https://github.com/webpop/extensions/tree/master/cart/stripe) for an example of how to do that.
 
 
 
