@@ -6,11 +6,11 @@ This extension uses the Google Analytics Experiments API to test different varia
 First go to you Google Analytics account and set up an experiment.
 It will ask for a set of urls to be your variations. For this exension to work, you should use the query parameters "?ab="
 
-E.g. You'd set an experiment for the Webpop homepage with these two urls:
+E.g. You'd set an experiment for the example.com hompepage with these two URL's:
 
-http://www.webpop.com
+http://www.example.com
 
-http://www.webpop.com?ab=b
+http://www.example.com?ab=b
 
 Once you've created your experiment, add this configuration tag to your layout, just inside of your `<head>` tag:
 
@@ -40,6 +40,6 @@ You can also have a variation in multiple parts of a template, the extensions wi
 Set up some goals
 =================
 
-The best way to do an experiment is usually to create a specific goal you want to achieve, and often that involves some sort of user action, set up [event tracking](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide#SettingUpEventTracking) to setup goals around specific events.
+The best way to do an experiment is usually to create a specific goal you want to achieve, and often that involves some sort of user action, set up [event tracking](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide#SettingUpEventTracking) to create goals around specific events.
 
 
