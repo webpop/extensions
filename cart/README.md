@@ -3,7 +3,8 @@ Shopping Cart Extension
 
 This is an extension for getting started with a simple shopping cart.
 
-Orders are submitted via email.
+In this extension, orders are submitted via email.
+Check out [the Stripe extension](https://github.com/webpop/extensions/tree/master/cart/stripe) for an example of integrating a payment gateway with this cart.
 
 Usage
 =====
