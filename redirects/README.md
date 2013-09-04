@@ -3,6 +3,8 @@ Redirects Extension
 
 This is an example of setting up some basic redirects with an extension.
 
-To use this, add the redirects.js file to your extension folder and assign redirects.js as the extension for your home section.
+To use this in you project:
 
-Then edit redirects.js to setup the redirects you need.
+1. Add the redirects.js file to your extension folder.
+2. Assign redirects.js as the extension for your home section.
+3. Edit redirects.js to setup the redirects you need.
