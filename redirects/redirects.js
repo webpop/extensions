@@ -1,7 +1,6 @@
 /* This is an extension for setting up redirects.
-   Note that these paths matches any format, so
-   "old-page" will both "/old-page.html" and
-   "/old-page"
+   These paths will match any format. So a redirect for "old-page"
+   will handle visits to "/old-page.html" as well as "/old-page"
 */
 
 exports.get = {
