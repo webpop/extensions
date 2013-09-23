@@ -158,7 +158,7 @@ exports.create_order = function(options) {
      total: exports.total()
   };
 
-  storage.put(options.id, JSON.stringify(order), {tags: ["ecommerce", "order"]});
+  storage.put(options.id, JSON.stringify(order), {tags: ["order"]});
 
   request.session.shopping_cart = null;
 
@@ -186,9 +186,13 @@ exports.routes = {
     },
     "orders": function(params) {
       if (request.user) {
-        var orders = storage.list({tags: ["ecommerce", "order"]}).map(function(data) {
+        var orders = storage.list({tags: ["order"]}).map(function(data) {
           var order = JSON.parse(data.value)
-          order.items = order.items.map(function(obj) { var item = obj.item; item.quantity = obj.quantity; return item; })
+          order.items = order.items.map(function(obj) {
+            var item = obj.item;
+            item.quantity = obj.quantity;
+            return item;
+          });
           return order;
         });
         orders = orders.sort(function(a,b) { return new Date(b.created_at).getTime() - new Date(a.created_at).getTime() });
@@ -234,7 +238,7 @@ exports.routes = {
       var items  = exports.items(),
           amount = parseFloat(params.amount);
 
-      response.render("cart/confirmation", {title: "Order confirmation", items: items, total: params.amount, total_cents: amount * 100});
+      response.render("cart/confirmation", {title: "Order confirmation", items: items, total: params.amount, total_cents: Math.round(amount * 100) });
     }
   }
 };
